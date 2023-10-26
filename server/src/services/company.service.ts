@@ -6,14 +6,17 @@ export const addCompany = async (data: ICompany) => {
 };
 
 export const updateCompany = async (id: Types.ObjectId, data: Partial<ICompany>) => {
-    return Company.findByIdAndUpdate(id, data);
+    return Company.findByIdAndUpdate(id, data, {
+        new: true,
+        runValidators: true
+    });
 };
 
 export const deleteCompany = async (id: Types.ObjectId) => {
     return Company.deleteOne({_id: id});
 };
 
-export const gerCompany = async (id: Types.ObjectId) => {
+export const getCompany = async (id: Types.ObjectId) => {
     return Company.findById(id);
 
 };
