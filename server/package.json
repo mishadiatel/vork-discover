@@ -1,0 +1,29 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "dev": "nodemon ./dist/server.js",
+    "watchts": "tsc -w",
+    "start:dev": "concurrently \"tsc -w\" \"nodemon ./dist/server.js\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/express": "^4.17.20",
+    "@types/mongoose": "^5.11.97",
+    "@types/node": "^20.8.8",
+    "concurrently": "^8.2.2",
+    "ts-node": "^10.9.1",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "mongoose": "^7.6.3",
+    "multer": "^1.4.5-lts.1",
+    "validator": "^13.11.0"
+  }
+}
