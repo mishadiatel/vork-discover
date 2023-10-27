@@ -1,11 +1,11 @@
 import {NextFunction, Request, Response} from 'express';
-import {addCompany, deleteCompany, getAllCompanies, getCompany, updateCompany} from '../services/company.service';
 import {Types} from 'mongoose';
+import Company from '../models/companyModel';
 import catchError from '../utils/catchError';
 import AppError from '../utils/AppError';
 
 export const getCompanies = catchError(async (req: Request, res: Response, next: NextFunction) => {
-    const companies = await getAllCompanies();
+    const companies = await Company.find();
     res.status(200).json({
         status: 'success',
         results: companies.length,
@@ -16,9 +16,9 @@ export const getCompanies = catchError(async (req: Request, res: Response, next:
 export const getCompanyById = catchError(async (req: Request, res: Response, next: NextFunction) => {
     const {id} = req.params;
     const objId = new Types.ObjectId(id);
-    const company = await getCompany(objId);
+    const company = await Company.findById(objId);
     if (!company) {
-        return next(new AppError('Not found company with that id', 404))
+        return next(new AppError('Not found company with that id', 404));
     }
     res.status(200).json({
         status: 'success',
@@ -29,9 +29,9 @@ export const getCompanyById = catchError(async (req: Request, res: Response, nex
 export const updateCompanyById = catchError(async (req: Request, res: Response, next: NextFunction) => {
     const {id} = req.params;
     const objId = new Types.ObjectId(id);
-    const company = await updateCompany(objId, req.body);
+    const company = await Company.findByIdAndUpdate(objId, req.body);
     if (!company) {
-        return next(new AppError('Not found company with that id', 404))
+        return next(new AppError('Not found company with that id', 404));
     }
     res.status(200).json({
         status: 'success',
@@ -42,7 +42,7 @@ export const updateCompanyById = catchError(async (req: Request, res: Response, 
 export const deleteCompanyById = catchError(async (req: Request, res: Response, next: NextFunction) => {
     const {id} = req.params;
     const objId = new Types.ObjectId(id);
-    const company = deleteCompany(objId);
+    const company = await Company.deleteOne({_id: objId});
 
     res.status(200).json({
         status: 'success',
@@ -52,7 +52,7 @@ export const deleteCompanyById = catchError(async (req: Request, res: Response, 
 
 export const createCompany = catchError(async (req: Request, res: Response, next: NextFunction) => {
     console.log(req.body);
-    const company = await addCompany(req.body);
+    const company = await Company.create(req.body);
     res.status(201).json({
         status: 'success',
         data: company
