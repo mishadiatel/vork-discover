@@ -11,12 +11,15 @@ export const getMe = catchError(async (req: Request, res: Response, next: NextFu
 });
 
 export const getUser = catchError(async (req: Request, res: Response, next: NextFunction) => {
-    const user = await User.findById(new Types.ObjectId(req.params.id))
-    if(!user) return next(new AppError('Not found user with that it', 404))
+    const user = await User.findById(new Types.ObjectId(req.params.id)).populate({
+        path: 'recruiterVacancies',
+        select: '-recruiter -__v'
+    }).populate('reviews');
+    if (!user) return next(new AppError('Not found user with that it', 404));
     res.status(200).json({
         status: 'success',
         data: user
-    })
+    });
 });
 
 export const updateCurrentUser = catchError(async (req: Request, res: Response, next: NextFunction) => {
@@ -24,7 +27,7 @@ export const updateCurrentUser = catchError(async (req: Request, res: Response, 
         return next(new AppError('This route is not for password updates. Please use /updateMyPassword.', 400));
     }
     const filteredBody = filterObj(req.body, 'firstName', 'lastName', 'email');
-    const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, { new: true, runValidators: true });
+    const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {new: true, runValidators: true});
     res.status(200).json({
         status: 'success',
         data: {

@@ -33,6 +33,8 @@ const reviewSchema = new Schema({
     }
 });
 
+reviewSchema.index({ vacancy: 1, user: 1 }, { unique: true });
+
 const Review = mongoose.model<ReviewDocument>('Review', reviewSchema);
 
 export default Review;

@@ -1,5 +1,6 @@
 import mongoose, {Schema, Types} from 'mongoose';
-import {ReviewDocument} from './reviewModel';
+import Review, {ReviewDocument} from './reviewModel';
+import {NextFunction} from 'express';
 
 export interface IVacancy {
     position: string,
@@ -12,8 +13,9 @@ export interface IVacancy {
 
 export interface VacancyDocument extends IVacancy, mongoose.Document {
     active: boolean;
-    reviews: ReviewDocument[];
+    // reviews: ReviewDocument[];
     createdAt: Date,
+    numberReviews: number,
 }
 
 const vacancySchema = new Schema({
@@ -58,12 +60,17 @@ vacancySchema.pre(/^find/, function (this: VacancyDocument, next) {
     next();
 });
 
-vacancySchema.virtual('reviews', {
+vacancySchema.virtual('numberReviews', {
     ref: 'Review',
     foreignField: 'vacancy',
-    localField: '_id'
-
+    localField: '_id',
+    count: true
 });
+
+vacancySchema.pre(/^find/, function (this: VacancyDocument, next) {
+    this.populate('numberReviews');
+    next();
+})
 
 const Vacancy = mongoose.model<VacancyDocument>('Vacancy', vacancySchema);
 
