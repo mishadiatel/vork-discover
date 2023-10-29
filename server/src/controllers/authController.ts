@@ -1,6 +1,6 @@
 import catchError from '../utils/catchError';
 import {NextFunction, Request, Response} from 'express';
-import * as jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import * as crypto from 'crypto';
 import User, {UserDocument} from '../models/userModel';
 import {Types} from 'mongoose';
@@ -81,9 +81,7 @@ export const protect = catchError(async (req: Request, res: Response, next: Next
     if (currentUser.changedPasswordAfter(decoded.iat)) {
         return next(new AppError('User recently changed password! Please login again.', 401));
     }
-    //@ts-ignore
     req.user = currentUser;
-    //@ts-ignore
     console.log(req.user);
     next();
 
@@ -91,7 +89,6 @@ export const protect = catchError(async (req: Request, res: Response, next: Next
 
 export const restrictTo = (...roles: string[]) => {
     return (req: Request, res: Response, next: NextFunction) => {
-        //@ts-ignore
         if (!roles.includes(req.user.role)) {
             return next(new AppError('You dont have permission po perform this action', 403));
         }
@@ -134,6 +131,17 @@ export const resetPassword = catchError(async (req: Request, res: Response, next
     user.passwordConfirm = req.body.passwordConfirm;
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
+    await user.save();
+    createSendToken(user, 200, res);
+});
+
+export const updatePassword = catchError(async (req: Request, res: Response, next: NextFunction) => {
+    const user: UserDocument = await User.findById(req.user.id).select('+password');
+    if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+        return next(new AppError('Your current password is wrong', 401));
+    }
+    user.password = req.body.password;
+    user.passwordConfirm = req.body.passwordConfirm;
     await user.save();
     createSendToken(user, 200, res);
 });

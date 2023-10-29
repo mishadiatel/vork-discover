@@ -11,7 +11,7 @@ export interface IUser {
     lastName: string;
     email: string;
     photo?: string;
-    role?: 'user' | 'hr' | 'admin';
+    role: 'user' | 'hr' | 'admin';
     password: string;
     passwordConfirm: string | undefined;
 }
