@@ -4,11 +4,14 @@ import {ReviewDocument} from './reviewModel';
 export interface IVacancy {
     position: string,
     company: Types.ObjectId,
+    recruiter: Types.ObjectId,
     endpoints: Array<Types.ObjectId>,
-    active: boolean
+    description: string,
+
 }
 
 export interface VacancyDocument extends IVacancy, mongoose.Document {
+    active: boolean;
     reviews: ReviewDocument[];
     createdAt: Date,
 }
@@ -18,9 +21,14 @@ const vacancySchema = new Schema({
             type: String,
             required: [true, 'Every vacancy should have a position']
         },
+        description: String,
         company: {
             type: Schema.Types.ObjectId,
             ref: 'Company'
+        },
+        recruiter: {
+            type: Schema.Types.ObjectId,
+            ref: 'User'
         },
         endpoints: [
             {
@@ -45,6 +53,8 @@ const vacancySchema = new Schema({
 
 vacancySchema.pre(/^find/, function (this: VacancyDocument, next) {
     this.populate('endpoints');
+    this.populate('recruiter');
+    this.populate('company');
     next();
 });
 

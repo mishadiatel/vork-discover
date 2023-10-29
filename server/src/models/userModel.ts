@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import {ReviewDocument} from './reviewModel';
+import {VacancyDocument} from './vacancyModel';
 
 const validator = require('validator');
 
@@ -10,7 +11,7 @@ export interface IUser {
     lastName: string;
     email: string;
     photo?: string;
-    role?: string;
+    role?: 'user' | 'hr' | 'admin';
     password: string;
     passwordConfirm: string | undefined;
 }
@@ -18,6 +19,7 @@ export interface IUser {
 export interface UserDocument extends IUser, mongoose.Document {
     fullName: string;
     reviews: ReviewDocument[];
+    recruiterVacancies: VacancyDocument[];
     passwordChangedAt: Date;
     passwordResetToken?: string;
     passwordResetExpires?: number;
@@ -47,7 +49,7 @@ const userSchema = new mongoose.Schema({
         photo: String,
         role: {
             type: String,
-            enum: ['user', 'admin'],
+            enum: ['user', 'hr', 'admin'],
             default: 'user'
         },
         password: {
@@ -87,6 +89,12 @@ userSchema.virtual('fullName').get(function (this: UserDocument) {
 userSchema.virtual('reviews', {
     ref: 'Review',
     foreignField: 'user',
+    localField: '_id'
+});
+
+userSchema.virtual('recruiterVacancies', {
+    ref: 'Vacancy',
+    foreignField: 'recruiter',
     localField: '_id'
 });
 

@@ -74,7 +74,7 @@ export const protect = catchError(async (req: Request, res: Response, next: Next
     const jwtSecret = process.env.JWT_SECRET || '';
     //@ts-ignore
     const decoded: { id: Types.ObjectId, iat: number } = await promisify(jwt.verify)(token, jwtSecret);
-    const currentUser = await User.findById(decoded.id);
+    const currentUser = await User.findById(decoded.id).populate('recruiterVacancies');
     if (!currentUser) {
         return next(new AppError('The user belonging to this token does no longer exist.', 401));
     }
@@ -83,9 +83,21 @@ export const protect = catchError(async (req: Request, res: Response, next: Next
     }
     //@ts-ignore
     req.user = currentUser;
+    //@ts-ignore
+    console.log(req.user);
     next();
 
 });
+
+export const restrictTo = (...roles: string[]) => {
+    return (req: Request, res: Response, next: NextFunction) => {
+        //@ts-ignore
+        if (!roles.includes(req.user.role)) {
+            return next(new AppError('You dont have permission po perform this action', 403));
+        }
+        next();
+    };
+};
 
 export const forgotPassword = catchError(async (req: Request, res: Response, next: NextFunction) => {
     const user = await User.findOne({ email: req.body.email });

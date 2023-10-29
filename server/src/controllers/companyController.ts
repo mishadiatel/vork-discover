@@ -16,7 +16,7 @@ export const getCompanies = catchError(async (req: Request, res: Response, next:
 export const getCompanyById = catchError(async (req: Request, res: Response, next: NextFunction) => {
     const {id} = req.params;
     const objId = new Types.ObjectId(id);
-    const company = await Company.findById(objId);
+    const company = await Company.findById(objId).populate('vacancies');
     if (!company) {
         return next(new AppError('Not found company with that id', 404));
     }
@@ -29,7 +29,10 @@ export const getCompanyById = catchError(async (req: Request, res: Response, nex
 export const updateCompanyById = catchError(async (req: Request, res: Response, next: NextFunction) => {
     const {id} = req.params;
     const objId = new Types.ObjectId(id);
-    const company = await Company.findByIdAndUpdate(objId, req.body);
+    const company = await Company.findByIdAndUpdate(objId, req.body, {
+        new: true,
+        runValidators: true
+    });
     if (!company) {
         return next(new AppError('Not found company with that id', 404));
     }

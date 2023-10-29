@@ -1,11 +1,11 @@
 import express, {Request, Response} from 'express';
 import companyRouter from './routes/companyRoute';
 import userRouter from './routes/userRoute';
-import endpointRouter from './routes/endpointRoute'
+import endpointRouter from './routes/endpointRoute';
+import vacancyRouter from './routes/vacancyRoute';
 import AppError from './utils/AppError';
 import ErrorHandler from './controllers/errorHandler';
 import cookieParser from 'cookie-parser';
-import endpointRoute from './routes/endpointRoute';
 
 
 export const app = express();
@@ -22,7 +22,8 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use('/api/v1/companies', companyRouter);
 app.use('/api/v1/users', userRouter);
-app.use('/api/v1/endpoints', endpointRoute)
+app.use('/api/v1/endpoints', endpointRouter)
+app.use('/api/v1/vacancies', vacancyRouter)
 
 app.all('*', (req, res, next) => {
     next(new AppError(`Can't find ${req.originalUrl} on this server.`, 404));

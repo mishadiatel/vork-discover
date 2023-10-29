@@ -1,4 +1,5 @@
 import mongoose, {Schema} from 'mongoose';
+import {VacancyDocument} from './vacancyModel';
 
 const validator = require('validator');
 
@@ -12,7 +13,7 @@ export interface ICompany {
 }
 
 export interface CompanyDocument extends ICompany, mongoose.Document {
-
+    vacancies: VacancyDocument[],
 }
 
 const companySchema = new Schema({
