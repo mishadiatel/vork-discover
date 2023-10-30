@@ -15,7 +15,12 @@ export const createVacancy = catchError(async (req: Request, res: Response, next
 });
 
 export const getAllVacancies = catchError(async (req: Request, res: Response, next: NextFunction) => {
-    const vacancies = await Vacancy.find({active: true});
+    const endpointsToFilter: string[] = req.body.endpoints;
+    let queryCondition = {};
+    queryCondition = endpointsToFilter && endpointsToFilter.length > 0 && {endpoints: {$in: endpointsToFilter}};
+    const vacancies = await Vacancy
+        .find({active: true, ...queryCondition})
+        .sort('-createdAt');
     res.status(200).json({
         status: 'success',
         results: vacancies.length,

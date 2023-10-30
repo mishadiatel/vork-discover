@@ -8,6 +8,7 @@ export interface IReview {
 }
 
 export interface ReviewDocument extends IReview, mongoose.Document {
+    rejected: boolean,
     createdAt: Date,
 }
 
@@ -27,6 +28,10 @@ const reviewSchema = new Schema({
         required: [true, 'Every review must have a little story about you']
     },
     resume: String,
+    rejected: {
+        type: Boolean,
+        default: false,
+    },
     createdAt: {
         type: Date,
         default: Date.now()

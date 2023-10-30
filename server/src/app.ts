@@ -6,7 +6,6 @@ import vacancyRouter from './routes/vacancyRoute';
 import AppError from './utils/AppError';
 import ErrorHandler from './controllers/errorHandler';
 import cookieParser from 'cookie-parser';
-import fileRoute from './routes/fileRoute';
 
 
 export const app = express();
@@ -14,7 +13,7 @@ export const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-app.use(express.static(__dirname + '/uploads'));
+app.use(express.static('uploads'));
 
 app.get('/', (req: Request, res: Response) => {
     return res.status(200).json({
@@ -23,7 +22,7 @@ app.get('/', (req: Request, res: Response) => {
     });
 });
 
-app.use('/', fileRoute);
+// app.use('/', fileRoute);
 app.use('/api/v1/companies', companyRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/endpoints', endpointRouter);
