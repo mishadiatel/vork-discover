@@ -14,11 +14,12 @@ export interface IUser {
     role: 'user' | 'hr' | 'admin';
     password: string;
     passwordConfirm: string | undefined;
+    additionalInfo: { tgLink: string, linkedInLink: string, gitHubLink: string, phoneNumber: string };
 }
 
 export interface UserDocument extends IUser, mongoose.Document {
     fullName: string;
-    reviews: ReviewDocument[];
+    // reviews: ReviewDocument[];
     recruiterVacancies: VacancyDocument[];
     passwordChangedAt: Date;
     passwordResetToken?: string;
@@ -26,7 +27,7 @@ export interface UserDocument extends IUser, mongoose.Document {
     createdAt: Date;
     correctPassword: (candidatePassword: string, userPassword: string) => Promise<boolean>;
     changedPasswordAfter: (JWTTimestamp: number) => boolean;
-    createPasswordResetToken: () => string
+    createPasswordResetToken: () => string;
 }
 
 
@@ -47,6 +48,28 @@ const userSchema = new mongoose.Schema({
             unique: true
         },
         photo: String,
+        additionalInfo: {
+            tgLink: {
+                type: String,
+                validate: [validator.isURL, 'User should provide a link'],
+                default: ''
+            },
+            linkedInLink: {
+                type: String,
+                validate: [validator.isURL, 'User should provide a link'],
+                default: ''
+            },
+            gitHubLink: {
+                type: String,
+                validate: [validator.isURL, 'User should provide a link'],
+                default: ''
+            },
+            phoneNumber: {
+                type: String,
+                validate: [validator.isMobilePhone, 'Please provide a correct phone number'],
+                default: ''
+            }
+        },
         role: {
             type: String,
             enum: ['user', 'hr', 'admin'],
@@ -86,11 +109,11 @@ userSchema.virtual('fullName').get(function (this: UserDocument) {
     return `${this.firstName} ${this.lastName}`;
 });
 
-userSchema.virtual('reviews', {
-    ref: 'Review',
-    foreignField: 'user',
-    localField: '_id'
-});
+// userSchema.virtual('reviews', {
+//     ref: 'Review',
+//     foreignField: 'user',
+//     localField: '_id'
+// });
 
 userSchema.virtual('recruiterVacancies', {
     ref: 'Vacancy',
@@ -131,10 +154,10 @@ userSchema.methods.changedPasswordAfter = function (this: UserDocument, JWTTimes
     return false;
 };
 
-userSchema.methods.createPasswordResetToken = function(this: UserDocument) {
+userSchema.methods.createPasswordResetToken = function (this: UserDocument) {
     const resetToken = crypto.randomBytes(32).toString('hex');
     this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-    console.log({ resetToken }, this.passwordResetToken);
+    console.log({resetToken}, this.passwordResetToken);
     this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
     return resetToken;
 };

@@ -8,37 +8,37 @@ import multer from 'multer';
 import sharp from 'sharp';
 
 
-const multerStorage = multer.memoryStorage();
+// const multerStorage = multer.memoryStorage();
+//
+// const imageFileFilter = (req: Request, file: Express.Multer.File, cb: Function) => {
+//     if (file.mimetype.startsWith('image')) {
+//         console.log('image');
+//         cb(null, true);
+//     } else {
+//         console.log('not image');
+//         cb(new AppError('Not an image. Please upload only images.', 400), false);
+//     }
+//
+// };
+//
+// const upload = multer({
+//     storage: multerStorage,
+//     fileFilter: imageFileFilter
+// });
+//
+// export const uploadUserPhoto = upload.single('photo');
 
-const imageFileFilter = (req: Request, file: Express.Multer.File, cb: Function) => {
-    if (file.mimetype.startsWith('image')) {
-        console.log('image');
-        cb(null, true);
-    } else {
-        console.log('not image');
-        cb(new AppError('Not an image. Please upload only images.', 400), false);
-    }
-
-};
-
-const upload = multer({
-    storage: multerStorage,
-    fileFilter: imageFileFilter
-});
-
-export const uploadUserPhoto = upload.single('photo');
-
-export const resizeUserPhoto = catchError(async (req: Request, res: Response, next: NextFunction) => {
-    if (!req.file) return next();
-    console.log(req.file);
-    req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
-    await sharp(req.file.buffer)
-        .resize(500, 500)
-        .toFormat('jpeg')
-        .jpeg({ quality: 90 })
-        .toFile(`uploads/${req.file.filename}`);
-    next();
-});
+// export const resizeUserPhoto = catchError(async (req: Request, res: Response, next: NextFunction) => {
+//     if (!req.file) return next();
+//     console.log(req.file);
+//     req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
+//     await sharp(req.file.buffer)
+//         .resize(500, 500)
+//         .toFormat('jpeg')
+//         .jpeg({ quality: 90 })
+//         .toFile(`uploads/${req.file.filename}`);
+//     next();
+// });
 export const getMe = catchError(async (req: Request, res: Response, next: NextFunction) => {
     req.params.id = req.user.id;
     next();
@@ -48,7 +48,7 @@ export const getUser = catchError(async (req: Request, res: Response, next: Next
     const user = await User.findById(new Types.ObjectId(req.params.id)).populate({
         path: 'recruiterVacancies',
         select: '-recruiter -__v'
-    }).populate('reviews');
+    })
     if (!user) return next(new AppError('Not found user with that it', 404));
     res.status(200).json({
         status: 'success',
@@ -61,7 +61,7 @@ export const updateCurrentUser = catchError(async (req: Request, res: Response, 
         return next(new AppError('This route is not for password updates. Please use /updateMyPassword.', 400));
     }
     const filteredBody = filterObj(req.body, 'firstName', 'lastName', 'email');
-    if (req.file) filteredBody.photo = req.file?.filename;
+    // if (req.file) filteredBody.photo = req.file?.filename;
     const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {new: true, runValidators: true});
     res.status(200).json({
         status: 'success',

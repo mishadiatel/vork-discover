@@ -1,8 +1,11 @@
 import {Router} from 'express';
 import {forgotPassword, login, protect, resetPassword, signup, updatePassword} from '../controllers/authController';
-import {getMe, getUser, resizeUserPhoto, updateCurrentUser, uploadUserPhoto} from '../controllers/userController';
+import {getMe, getUser, updateCurrentUser} from '../controllers/userController';
+import reviewsRoute from './reviewsRoute';
 
 const router = Router();
+
+router.use('/me', reviewsRoute)
 
 router.post('/signup', signup);
 router.post('/login', login);
@@ -14,8 +17,8 @@ router.use(protect);
 router.patch('/updateMyPassword', updatePassword);
 router.get('/me', getMe, getUser);
 router.patch('/updateMe',
-    uploadUserPhoto,
-    resizeUserPhoto,
+    // uploadUserPhoto,
+    // resizeUserPhoto,
     updateCurrentUser
 );
 

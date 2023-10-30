@@ -1,6 +1,6 @@
 import {Router} from 'express';
 import {protect, restrictTo} from '../controllers/authController';
-import {createReview, getVacancyReviews, rejectReview, uploadFile} from '../controllers/reviewController';
+import {createReview, getReviews, rejectReview} from '../controllers/reviewController';
 
 const router = Router({mergeParams: true});
 
@@ -8,13 +8,12 @@ router.route('/reviews')
     .post(
         protect,
         restrictTo('user'),
-        uploadFile,
+        // uploadFile,
         createReview
     )
     .get(
         protect,
-        restrictTo('hr'),
-        getVacancyReviews
+        getReviews
     );
 
 router.patch('/reviews/:reviewId/reject',

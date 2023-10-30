@@ -50,7 +50,7 @@ export const signup = catchError(async (req: Request, res: Response, next: NextF
 export const login = catchError(async (req: Request, res: Response, next: NextFunction) => {
     const {email, password} = req.body;
     if (!email || !password) {
-       return  next(new AppError('Please provide email and password', 400));
+        return next(new AppError('Please provide email and password', 400));
     }
     const user = await User.findOne({email}).select('+password');
     if (!user || !(await user.correctPassword(password, user.password))) {
@@ -75,8 +75,7 @@ export const protect = catchError(async (req: Request, res: Response, next: Next
     //@ts-ignore
     const decoded: { id: Types.ObjectId, iat: number } = await promisify(jwt.verify)(token, jwtSecret);
     const currentUser = await User.findById(decoded.id)
-        .populate('recruiterVacancies')
-        .populate('reviews');
+        .populate('recruiterVacancies');
     if (!currentUser) {
         return next(new AppError('The user belonging to this token does no longer exist.', 401));
     }
@@ -84,7 +83,7 @@ export const protect = catchError(async (req: Request, res: Response, next: Next
         return next(new AppError('User recently changed password! Please login again.', 401));
     }
     req.user = currentUser;
-    console.log(req.user);
+    // console.log(req.user);
     next();
 
 });
@@ -99,12 +98,12 @@ export const restrictTo = (...roles: string[]) => {
 };
 
 export const forgotPassword = catchError(async (req: Request, res: Response, next: NextFunction) => {
-    const user = await User.findOne({ email: req.body.email });
+    const user = await User.findOne({email: req.body.email});
     if (!user) {
         return next(new AppError('There is no user with this email address', 404));
     }
     const resetToken = user.createPasswordResetToken();
-    await user.save({ validateBeforeSave: false });
+    await user.save({validateBeforeSave: false});
     try {
         const resetURL = `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${resetToken}`;
         await new Email(user, resetURL).sendPasswordReset();
@@ -115,7 +114,7 @@ export const forgotPassword = catchError(async (req: Request, res: Response, nex
     } catch (err) {
         user.passwordResetToken = undefined;
         user.passwordResetExpires = undefined;
-        await user.save({ validateBeforeSave: false });
+        await user.save({validateBeforeSave: false});
         return next(new AppError('There was an error sending email. Please try again later!', 500));
     }
 });
@@ -124,7 +123,7 @@ export const resetPassword = catchError(async (req: Request, res: Response, next
     const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
     const user = await User.findOne({
         passwordResetToken: hashedToken,
-        passwordResetExpires: { $gt: Date.now() }
+        passwordResetExpires: {$gt: Date.now()}
     });
     if (!user) {
         return next(new AppError('Token is invalid or has expired', 400));

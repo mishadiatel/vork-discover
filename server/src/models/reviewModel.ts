@@ -4,7 +4,7 @@ export interface IReview {
     vacancy: Types.ObjectId,
     user: Types.ObjectId,
     aboutMe: string,
-    resume: string,
+    // resume: string,
 }
 
 export interface ReviewDocument extends IReview, mongoose.Document {
@@ -27,7 +27,7 @@ const reviewSchema = new Schema({
         type: String,
         required: [true, 'Every review must have a little story about you']
     },
-    resume: String,
+    // resume: String,
     rejected: {
         type: Boolean,
         default: false,
