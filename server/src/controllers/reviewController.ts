@@ -40,9 +40,11 @@ export const getReviews = catchError(async (req: Request, res: Response, next: N
     if (isHr && !req.user.recruiterVacancies.find(vac => vac.id === req.params.vacancyId)) {
         return next(new AppError('You cant read reviews to not your vacancies', 500));
     }
-    const queryFilter = isHr ?
-        {vacancy: new Types.ObjectId(req.params.vacancyId)} :
-        {user: req.user._id};
+    let queryFilter: any = {user: req.user._id};
+    if(isHr && req.params.vacancyId) {
+        queryFilter = {vacancy: new Types.ObjectId(req.params.vacancyId)};
+    }
+
     const reviews = await Review.find(queryFilter)
         .populate({
             path: 'user',

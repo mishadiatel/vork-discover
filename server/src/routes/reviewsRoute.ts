@@ -13,6 +13,7 @@ router.route('/reviews')
     )
     .get(
         protect,
+        restrictTo('hr'),
         getReviews
     );
 
